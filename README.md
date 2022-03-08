@@ -1,4 +1,4 @@
-# istio-in-practise
+# GitOps-in-Practise
 
 本项目是[马哥教育](http://www.magedu.com)的GitOps进阶实践专题课程的实践代码库。
 
