@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-with-params
+spec:
+  params:
+    - name: target
+      type: string
+      default: "MageEdu"
+    - name: text
+      type: string
+      default: "Something happened"
+  tasks:
+    - name: task-one
+      taskRef:
+        name: hello-params
+    - name: task-two
+      taskRef:
+        name: logger
+      params:
+        - name: text
+          value: "Something has happened"

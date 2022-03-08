@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: source-lister
+spec:
+  params:
+  - name: git-repo
+    type: string
+    description: Git repository to be cloned
+  workspaces:
+  - name: source
+  steps:
+  - name: git-clone
+    image: alpine/git:v2.32.0
+    script: git clone -v $(params.git-repo) $(workspaces.source.path)/source
+  - name: list-files
+    image: alpine:3.15
+    command:
+    - /bin/sh
+    args:
+    - '-c'
+    - 'ls $(workspaces.source.path)/source'

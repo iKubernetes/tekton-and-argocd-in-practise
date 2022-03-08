@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: image-build
+spec:
+  description: package the application files to image
+  params:
+    - name: dockerfile
+      description: The path to the dockerfile to build (relative to the context)
+      default: Dockerfile
+    - name: image-url
+      description: Url of image repository
+    - name: image-tag
+      description: Tag to apply to the built image
+      default: latest
+  workspaces:
+    - name: source
+  steps:
+    - name: build-and-push-image
+      image: gcr.io/kaniko-project/executor:debug
+      securityContext:
+        runAsUser: 0
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.dockerfile)
+        - --context=$(workspaces.source.path)/source
+        - --no-push

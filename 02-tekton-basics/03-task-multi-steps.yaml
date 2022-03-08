@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: multiple
+spec:
+  steps:
+    - name: first
+      image: alpine:3.15
+      command:
+        - /bin/sh
+      args: ['-c', 'echo First Step']
+    - name: second
+      image: alpine:3.15
+      command:
+        - /bin/sh
+      args: ['-c', 'echo Second Step']

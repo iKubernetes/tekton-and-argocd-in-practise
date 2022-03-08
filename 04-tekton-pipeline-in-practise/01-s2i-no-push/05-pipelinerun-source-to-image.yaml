@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: s2i-no-push-run-00001
+spec:
+  pipelineRef:
+    name: source-to-image
+  params:
+    - name: git-url
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+    - name: image-url
+      value: ikubernetes/spring-boot-helloworld
+    - name: image-tag
+      value: latest
+  workspaces:
+    - name: codebase
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-csi

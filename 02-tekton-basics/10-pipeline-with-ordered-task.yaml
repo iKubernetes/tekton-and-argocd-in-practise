@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-task-ordering
+spec:
+  tasks:
+    - name: task-a
+      taskRef:
+        name: logger
+      params:
+      - name: text
+        value: "task-A executed"
+    - name: task-b
+      taskRef:
+        name: logger
+      params:
+      - name: text
+        value: "Executed after task-A"
+      runAfter: ["task-a"]
+    - name: task-c
+      taskRef:
+        name: logger
+      params:
+      - name: text
+        value: "Executed after task-A"
+      runAfter: ["task-a"]
+    - name: task-d
+      taskRef:
+        name: logger
+      params:
+      - name: text
+        value: "Executed after task-B and task-C"
+      runAfter: ["task-b", "task-c"]

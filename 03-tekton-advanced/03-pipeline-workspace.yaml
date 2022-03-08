@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-source-lister
+spec:
+  workspaces:
+  - name: codebase
+  params:
+  - name: git-url
+    type: string
+    description: Git repository url to be cloned
+  tasks:
+  - name: git-clone
+    taskRef:
+      name: source-lister
+    workspaces:
+    - name: source
+      workspace: codebase
+    params:
+    - name: git-repo
+      value: $(params.git-url)

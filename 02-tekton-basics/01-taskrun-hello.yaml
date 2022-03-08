@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: hello-run-xxxxx
+  namespace: default
+spec:
+  serviceAccountName: default
+  taskRef:
+    kind: Task
+    name: hello
+  timeout: 1h0m0s

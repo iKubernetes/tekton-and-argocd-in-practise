@@ -1,0 +1,63 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: source-2-package
+spec:
+  params:
+    - name: git-url
+      type: string
+  workspaces:
+    - name: codebase
+  tasks:
+    - name: fetch-from-source
+      params:
+        - name: url
+          value: $(params.git-url)
+      taskSpec:
+        workspaces:
+          - name: source
+        params:
+          - name: url
+        steps:
+          - name: git-clone
+            image: alpine/git:v2.32.0
+            script: git clone -v $(params.url) $(workspaces.source.path)/source
+      workspaces:
+        - name: source
+          workspace: codebase
+    - name: build-package
+      runAfter:
+        - fetch-from-source
+      taskSpec:
+        steps:
+          - name: build
+            image: maven:3.8-openjdk-11-slim
+            workingDir: $(workspaces.source.path)/source
+            script: |
+              mvn clean install
+        workspaces:
+          - name: source
+      workspaces:
+        - name: source
+          workspace: codebase
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: source-2-package-run-001
+spec:
+  pipelineRef:
+    name: source-2-package
+  params:
+    - name: git-url
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+  workspaces:
+    - name: codebase
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-csi

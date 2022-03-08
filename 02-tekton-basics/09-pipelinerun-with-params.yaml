@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pipeline-with-params-run-xxxxx
+  namespace: default
+spec:
+  params:
+  - name: target
+    value: "MageEdu CloudNative Course"
+  - name: text
+    value: "Something has happened ~~."
+  pipelineRef:
+    name: pipeline-with-params
+  serviceAccountName: default
+  timeout: 10m0s

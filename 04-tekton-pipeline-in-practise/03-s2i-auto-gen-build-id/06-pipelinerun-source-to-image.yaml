@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: s2i-buildid-run-00001
+spec:
+  pipelineRef:
+    name: source-to-image
+  params:
+    - name: git-url
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+    - name: image-url
+      value: ikubernetes/spring-boot-helloworld
+    - name: version
+      value: v0.9.2
+  workspaces:
+    - name: codebase
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-csi
+    - name: docker-config
+      secret:
+        secretName: docker-config

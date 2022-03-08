@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: script
+spec:
+  steps:
+    - name: step-with-script
+      image: alpine:3.15
+      script: |
+        #!/bin/sh
+        echo "Step with Script..."
+        echo "Installing necessary tooling"
+        apk add curl
+        curl -s www.magedu.com && echo "Success" || echo "Fail" 
+        echo "All done!"

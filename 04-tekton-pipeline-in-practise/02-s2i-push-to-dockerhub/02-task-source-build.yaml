@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-to-package
+spec:
+  description: build application and package the files to image
+  workspaces:
+    - name: source
+      description: The git repo that cloned onto the volume backing this workspace
+  steps:
+    - name: build
+      image: maven:3.8-openjdk-11-slim
+      workingDir: $(workspaces.source.path)/source
+      volumeMounts:
+        - name: m2
+          mountPath: /root/.m2
+      script: mvn clean install
+  volumes:
+    - name: m2
+      persistentVolumeClaim:
+        claimName: maven-cache

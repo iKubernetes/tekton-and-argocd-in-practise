@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pipeline-demo-run-xxxxx
+  namespace: default
+spec:
+  pipelineRef:
+    name: pipeline-demo
+  serviceAccountName: default
+  timeout: 1h0m0s

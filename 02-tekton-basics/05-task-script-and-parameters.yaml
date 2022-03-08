@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: logger
+spec:
+  params:
+    - name: text
+      type: string
+      description: something to log
+      default: "-"
+  steps:
+    - name: log
+      image: alpine:3.15
+      script: |
+        apk add -q tzdata
+        cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+        DATETIME=$(date "+%F %T")
+        echo [$DATETIME] - $(params.text)

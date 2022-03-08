@@ -1,0 +1,84 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: source-to-image
+spec:
+  params:
+    - name: git-url
+    - name: pathToContext
+      description: The path to the build context, used by Kaniko - within the workspace
+      default: .
+    - name: image-url
+      description: Url of image repository
+    - name: deploy-config-file
+      description: The path to the yaml file to deploy within the git source
+      default: all-in-one.yaml
+    - name: version
+      description: The version of the application
+      type: string
+      default: "v0.9" 
+  results:
+    - name: datetime
+      description: The current date and time
+    - name: buildId
+      description: The build ID
+  workspaces:
+    - name: codebase
+    - name: docker-config
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: "$(params.git-url)"
+      workspaces:
+        - name: source
+          workspace: codebase
+    - name: build-to-package
+      taskRef:
+        name: build-to-package
+      workspaces:
+        - name: source
+          workspace: codebase
+      runAfter:
+        - git-clone
+    - name: generate-build-id
+      taskRef:
+        name: generate-build-id
+      params:
+        - name: version
+          value: "$(params.version)"
+      runAfter:
+        - git-clone
+    - name: image-build-and-push
+      taskRef:
+        name: image-build-and-push
+      params:
+        - name: image-url
+          value: "$(params.image-url)"
+        - name: image-tag
+          value: "$(tasks.generate-build-id.results.buildId)"
+      workspaces:
+        - name: source
+          workspace: codebase
+        - name: dockerconfig
+          workspace: docker-config
+      runAfter:
+        - generate-build-id
+        - build-to-package
+    - name: deploy-to-cluster
+      taskRef:
+        name: deploy-using-kubectl
+      workspaces:
+        - name: source
+          workspace: codebase
+      params:
+        - name: deploy-config-file
+          value: $(params.deploy-config-file)
+        - name: image-url
+          value: $(params.image-url)
+        - name: image-tag
+          value: "$(tasks.generate-build-id.results.buildId)"
+      runAfter:
+        - image-build-and-push

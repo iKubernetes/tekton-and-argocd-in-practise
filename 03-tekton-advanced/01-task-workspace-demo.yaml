@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: workspace-demo
+spec:
+  params:
+  - name: target
+    type: string
+    default: MageEdu
+  steps:
+    - name: write-message
+      image: alpine:3.15
+      script: |
+        #!/bin/sh
+        set -xe
+        if [ "$(workspaces.messages.bound)" == "true" ] ; then
+          echo "Hello $(params.target)" > $(workspaces.messages.path)/message
+        fi
+        echo "Mount Path: $(workspaces.messages.path)"
+        echo "Volume Name: $(workspaces.messages.volume)"
+  workspaces:
+    - name: messages
+      description: |
+        The folder where we write the message to. If no workspace
+        is provided then the message will not be written.
+      optional: true
+      mountPath: /data

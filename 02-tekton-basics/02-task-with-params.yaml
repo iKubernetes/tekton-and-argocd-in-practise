@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-params
+spec:
+  params:
+    - name: target
+      type: string
+      description: Name of somebody or something to greet
+      default: MageEdu.Com
+  steps:
+    - name: say-hello
+      image: alpine:3.15
+      command:
+        - /bin/sh
+      args: ['-c', 'echo Hello $(params.target)']
