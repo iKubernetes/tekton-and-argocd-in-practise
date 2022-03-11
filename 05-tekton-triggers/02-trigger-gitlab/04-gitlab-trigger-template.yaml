@@ -1,0 +1,38 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: gitlab-trigger-template
+spec:
+  params:  # 定义参数
+  - name: git-revision
+  - name: git-repo-url
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: TaskRun
+    metadata:
+      generateName: gitlab-trigger-run-  # TaskRun 名称前缀
+    spec:
+      serviceAccountName: tekton-triggers-gitlab-sa
+      params:
+        - name: git-revision
+          value: $(tt.params.git-revision)
+        - name: git-repo-url
+          value: $(tt.params.git-repo-url)
+      workspaces:
+        - name: source
+          emptyDir: {}
+      taskSpec:
+        workspaces:
+          - name: source
+        params:
+          - name: git-revision
+          - name: git-repo-url
+        steps:
+          - name: fetch-from-git-repo
+            image: alpine/git:v2.32.0
+            script: |
+              git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
+              cd $(workspaces.source.path)/source && git reset --hard $(params.git-revision)
+          - name: list-files
+            image: alpine:3.15
+            script: ls -la $(workspaces.source.path)/source

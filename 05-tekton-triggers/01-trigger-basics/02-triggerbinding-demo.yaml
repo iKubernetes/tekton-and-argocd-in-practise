@@ -1,0 +1,12 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: pipeline-binding-demo
+spec:
+  params:
+  - name: git-url
+    value: $(body.head_commit.id)
+  - name: image-url
+    value: $(body.repository.url)
+  - name: version
+    value: $(header.Content-Type)

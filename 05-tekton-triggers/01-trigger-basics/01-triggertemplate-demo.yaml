@@ -1,0 +1,43 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: pipeline-template-demo
+spec:
+  params:
+    - name: image-url
+      default: ikubernetes/spring-boot-helloworld
+    - name: git-revision
+      description: The git revision (SHA)
+      default: master
+    - name: git-url
+      description: The git repository url ("https://github.com/foo/bar.git")
+    - name: version
+      description: The version of application
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: pipeline-run-
+      spec:
+        pipelineRef:
+          name: source-to-image
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: image-url
+            value: $(tt.params.image-url)
+          - name: version
+            value: $(tt.params.version)
+        workspaces:
+          - name: codebase
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+                storageClassName: nfs-csi
+          - name: docker-config
+            secret:
+              secretName: docker-config

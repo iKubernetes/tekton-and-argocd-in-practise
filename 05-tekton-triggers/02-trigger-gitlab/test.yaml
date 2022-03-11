@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: gitlab-run-00001  # TaskRun 名称前缀
+spec:
+  serviceAccountName: tekton-triggers-gitlab-sa
+  params:
+    - name: git-revision
+      value: main
+    - name: git-repo-url
+      value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloworld.git
+  workspaces:
+    - name: source
+      emptyDir: {}
+  taskSpec:
+    params:
+      - name: git-revision
+      - name: git-repo-url
+    workspaces:
+      - name: source
+    steps:
+      - name: fetch-from-git-repo
+        image: alpine/git:v2.32.0
+        script: git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
+      - name: list-files
+        image: alpine:3.15
+        script: ls -la $(workspaces.source.path)/source
