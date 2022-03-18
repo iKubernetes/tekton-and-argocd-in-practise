@@ -15,6 +15,7 @@ spec:
         set -xe
         if [ "$(workspaces.messages.bound)" == "true" ] ; then
           echo "Hello $(params.target)" > $(workspaces.messages.path)/message
+          cat $(workspaces.messages.path)/message
         fi
         echo "Mount Path: $(workspaces.messages.path)"
         echo "Volume Name: $(workspaces.messages.volume)"

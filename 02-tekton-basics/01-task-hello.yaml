@@ -6,6 +6,5 @@ spec:
   steps:
     - name: say-hello
       image: alpine:3.15
-      command:
-        - /bin/sh
+      command: ['/bin/sh']
       args: ['-c', 'echo Hello World']

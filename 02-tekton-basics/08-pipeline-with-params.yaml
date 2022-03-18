@@ -4,12 +4,8 @@ metadata:
   name: pipeline-with-params
 spec:
   params:
-    - name: target
-      type: string
-      default: "MageEdu"
     - name: text
       type: string
-      default: "Something happened"
   tasks:
     - name: task-one
       taskRef:
@@ -19,4 +15,4 @@ spec:
         name: logger
       params:
         - name: text
-          value: "Something has happened"
+          value: $(params.text)

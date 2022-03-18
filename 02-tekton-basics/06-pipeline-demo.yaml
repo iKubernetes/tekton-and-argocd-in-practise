@@ -10,3 +10,5 @@ spec:
     - name: second-task
       taskRef:
         name: multiple
+      runAfter:
+        - first-task
