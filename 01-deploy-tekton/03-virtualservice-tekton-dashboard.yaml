@@ -1,0 +1,50 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: tekton-dashboard
+  namespace: tekton-pipelines
+spec:
+  host: tekton-dashboard
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: tekton-dashboard-gateway
+  namespace: istio-system
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "tekton.magedu.com"
+    - "ci.magedu.com"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: tekton-dashboard-virtualservice
+  namespace: tekton-pipelines
+spec:
+  hosts:
+  - "tekton.magedu.com"
+  - "ci.magedu.com"
+  gateways:
+  - istio-system/tekton-dashboard-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: tekton-dashboard
+        port:
+          number: 9097
+---

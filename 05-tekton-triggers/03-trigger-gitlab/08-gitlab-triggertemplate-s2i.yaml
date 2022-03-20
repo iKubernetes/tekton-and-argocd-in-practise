@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: gitlab-trigger-template
+  name: s2i-tt
 spec:
   params:  # 定义参数
   - name: git-revision

@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: s2i-buildid-run-00002
+  name: s2i-buildid-run-00003
 spec:
   serviceAccountNames:
     - taskName: deploy-to-cluster
@@ -10,11 +10,11 @@ spec:
     name: source-to-image
   params:
     - name: git-url
-      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloWorld.git
     - name: image-url
       value: ikubernetes/spring-boot-helloworld
     - name: version
-      value: v0.9.2
+      value: v0.9.3
   workspaces:
     - name: codebase
       volumeClaimTemplate:

@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerBinding
 metadata:
-  name: gitlab-push-binding
+  name: s2i-binding
 spec:
   params:
   - name: git-revision

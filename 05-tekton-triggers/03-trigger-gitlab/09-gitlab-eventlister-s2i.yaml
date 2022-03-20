@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: gitlab-event-listener
+  name: s2i-listener 
 spec:
   serviceAccountName: tekton-triggers-gitlab-sa
   triggers:
@@ -17,6 +17,6 @@ spec:
       - name: "eventTypes"
         value: ["Push Hook"]
     bindings:
-    - ref: gitlab-push-binding
+    - ref: s2i-binding
     template:
-      ref: gitlab-trigger-template
+      ref: s2i-tt
