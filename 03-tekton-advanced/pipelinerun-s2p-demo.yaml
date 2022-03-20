@@ -1,0 +1,21 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: s2p-demo-run-00001
+spec:
+  pipelineRef:
+    name: s2p-demo
+  params:
+    - name: git-repo-url
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+  workspaces:
+    - name: source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-csi

@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: source-to-package
+spec:
+  params:
+  - name: git-repo-url
+    type: string
+  workspaces:
+    - name: source
+      description: code storage
+  steps:
+    - name: fetch-from-source
+      image: alpine/git:v2.32.0
+      script: |
+        git clone $(params.git-repo-url) $(workspaces.source.path)/source
+    - name: build-to-package
+      image: maven:3.8-openjdk-11-slim
+      workingDir: $(workspaces.source.path)/source
+      script: |
+        mvn clean install
+      volumeMounts:
+        - name: maven-cache
+          mountPath: /root/.m2
+  volumes:
+  - name: maven-cache
+    persistentVolumeClaim:
+      claimName: maven-cache
