@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-spring-boot-helloworld
+spec:
+  replicas: 10 
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10 
+      - pause: {}
+      - setWeight: 20
+      - pause: {duration: 10}
+      - setWeight: 30
+      - pause: {duration: 10}
+      - setWeight: 40
+      - pause: {duration: 20}
+      - setWeight: 60
+      - pause: {duration: 20}
+      - setWeight: 80
+      - pause: {duration: 20}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: spring-boot-helloworld
+  template:
+    metadata:
+      labels:
+        app: spring-boot-helloworld
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: ikubernetes/spring-boot-helloworld:v0.9.4
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: 32Mi
+            cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-helloworld
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-boot-helloworld
