@@ -1,0 +1,102 @@
+# CopyRight: MageEdu <mage@magedu.com>
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-helloworld-with-traffic-shifting
+spec:
+  replicas: 10 
+  strategy:
+    canary:
+      trafficRouting:
+        istio:
+          virtualService: 
+            name: helloworld-rollout-vsvc        # required
+            routes:
+            - primary                 # optional if there is a single route in VirtualService, required otherwise
+          destinationRule:
+            name: helloworld-rollout-destrule    # required
+            canarySubsetName: canary  # required
+            stableSubsetName: stable  # required
+      steps:
+      - setWeight: 5
+      - pause: {duration: 2m}
+      - setWeight: 10
+      - pause: {duration: 2m}
+      - setWeight: 20
+      - pause: {duration: 1m}
+      - setWeight: 40
+      - pause: {duration: 20}
+      - setWeight: 60
+      - pause: {duration: 20}
+      - setWeight: 80
+      - pause: {duration: 20}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: spring-boot-helloworld
+  template:
+    metadata:
+      labels:
+        app: spring-boot-helloworld
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: ikubernetes/spring-boot-helloworld:v0.9.4
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: 32Mi
+            cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-helloworld
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-boot-helloworld
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: helloworld-rollout-vsvc
+spec:
+  #gateways:
+  #- istio-rollout-gateway
+  hosts:
+  - spring-boot-helloworld
+  http:
+  - name: primary       # referenced in canary.trafficRouting.istio.virtualService.routes
+    route:
+    - destination:
+        host: spring-boot-helloworld
+        subset: stable  # referenced in canary.trafficRouting.istio.destinationRule.stableSubsetName
+      weight: 100
+    - destination:
+        host: spring-boot-helloworld
+        subset: canary  # referenced in canary.trafficRouting.istio.destinationRule.canarySubsetName
+      weight: 0
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: helloworld-rollout-destrule
+spec:
+  host: spring-boot-helloworld
+  subsets:
+  - name: canary   # referenced in canary.trafficRouting.istio.destinationRule.canarySubsetName
+    labels:        # labels will be injected with canary rollouts-pod-template-hash value
+      app: spring-boot-helloworld
+  - name: stable   # referenced in canary.trafficRouting.istio.destinationRule.stableSubsetName
+    labels:        # labels will be injected with stable rollouts-pod-template-hash value
+      app: spring-boot-helloworld
+---
