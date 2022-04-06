@@ -1,0 +1,46 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: argocd-dashboard-gateway
+  namespace: istio-system
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+    - hosts:
+        - "argocd.magedu.com"
+      port:
+        number: 80
+        name: http
+        protocol: HTTP
+      tls:
+        httpsRedirect: true
+    - hosts:
+        - "argocd.magedu.com"
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: argocd-dashboard-virtualservice
+  namespace: argocd
+spec:
+  hosts:
+  - "argocd.magedu.com"
+  gateways:
+  - istio-system/argocd-dashboard-gateway
+  tls:
+  - match:
+    - port: 443
+      sniHosts:
+      - argocd.magedu.com
+    route:
+    - destination:
+        host: argocd-server
+        port:
+          number: 443
