@@ -54,15 +54,21 @@ spec:
           - name: service-name
             value: spring-boot-helloworld.demo.svc.cluster.local
       - setWeight: 10
-      - pause: {duration: 2m}
-      - setWeight: 20
       - pause: {duration: 1m}
-      - setWeight: 40
-      - pause: {duration: 20}
-      - setWeight: 60
-      - pause: {duration: 20}
-      - setWeight: 80
-      - pause: {duration: 20}
+      - analysis:
+          templates:
+          - templateName: success-rate
+          args:
+          - name: service-name
+            value: spring-boot-helloworld.demo.svc.cluster.local
+      - setWeight: 30
+      - pause: {duration: 1m}
+      - analysis:
+          templates:
+          - templateName: success-rate
+          args:
+          - name: service-name
+            value: spring-boot-helloworld.demo.svc.cluster.local
   revisionHistoryLimit: 5
   selector:
     matchLabels:
