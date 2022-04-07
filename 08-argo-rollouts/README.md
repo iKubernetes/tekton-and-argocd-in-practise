@@ -6,18 +6,18 @@ kubectl apply -f 01-argo-rollouts-demo.yaml -n demo
 
 #### rollout
 
-kubectl argo rollouts set image rollouts-spring-boot-helloworld spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.5
+kubectl argo rollouts set image rollouts-spring-boot-helloworld spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.5 -n demo
 
 #### watch
 
 ```bash
-kubectl argo rollouts get rollout rollouts-spring-boot-helloworld --watch
+kubectl argo rollouts get rollout rollouts-spring-boot-helloworld --watch -n demo
 ```
 
 #### Promote
 
 ```bash
-kubectl argo rollouts promote rollouts-spring-boot-helloworld
+kubectl argo rollouts promote rollouts-spring-boot-helloworld -n demo
 ```
 
 ### 02-argo-rollouts-with-istio-traffic-shifting.yaml
