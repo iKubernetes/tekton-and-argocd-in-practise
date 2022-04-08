@@ -44,17 +44,15 @@ spec:
             name: helloworld-rollout-destrule
             canarySubsetName: canary
             stableSubsetName: stable
-      analysis:
-        templates:
-        - templateName: success-rate
-        args:
-        - name: service-name
-          # change this value to your service name
-          value: spring-boot-helloworld.demo.svc.cluster.local
-        startingStep: 2
       steps:
       - setWeight: 5
-      - pause: {duration: 1m}
+      - pause: {duration: 2m}
+      - analysis:
+          templates:
+          - templateName: success-rate
+          args:
+          - name: service-name
+            value: spring-boot-helloworld.demo.svc.cluster.local
       - setWeight: 10
       - pause: {duration: 1m}
       - setWeight: 30

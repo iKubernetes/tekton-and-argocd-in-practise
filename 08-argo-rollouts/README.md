@@ -2,11 +2,16 @@
 
 ### 01-argo-rollouts-demo.yaml
 
+```bash
+kubectl create namespace demo
 kubectl apply -f 01-argo-rollouts-demo.yaml -n demo
+```
 
 #### rollout
 
-kubectl argo rollouts set image rollouts-spring-boot-helloworld spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.5 -n demo
+```bash
+kubectl argo rollouts set image rollouts-spring-boot-helloworld spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.6 -n demo
+```
 
 #### watch
 
@@ -25,6 +30,8 @@ kubectl argo rollouts promote rollouts-spring-boot-helloworld -n demo
 **Dependicies**: Istio
 
 ```bash
+kubectl create namespace demo
+kubectl label namespace demo istio-injection=enabled
 kubectl apply -f 02-argo-rollouts-with-istio-traffic-shifting.yaml -n demo
 ```
 
@@ -42,7 +49,7 @@ while true; do curl http://spring-boot-helloworld.demo.svc.cluster.local; echo; 
 #### Rollout
 
 ```bash
-kubectl argo rollouts set image rollouts-helloworld-with-traffic-shifting spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.5 -n demo
+kubectl argo rollouts set image rollouts-helloworld-with-traffic-shifting spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.6 -n demo
 ```
 
 ### 03-argo-rollouts-with-analysis.yaml
@@ -50,11 +57,30 @@ kubectl argo rollouts set image rollouts-helloworld-with-traffic-shifting spring
 **Dependicies**: Istio and Prometheus
 
 ```bash
-kubectl apply -f 02-argo-rollouts-with-istio-traffic-shifting.yaml -n demo
+kubectl create namespace demo
+kubectl label namespace demo istio-injection=enabled
+kubectl apply -f 03-argo-rollouts-with-analysis.yaml -n demo
 ```
+
+#### Prometheus Metrics
+
+```
+irate of requests that the response code not 5xx: sum(irate(istio_requests_total{reporter="source",destination_service="spring-boot-helloworld.default.svc.cluster.local",response_code!~"5.*"}[1m]))
+```
+
+```
+irate of all requests: irate(istio_requests_total{reporter="source",destination_service="spring-boot-helloworld.default.svc.cluster.local"}[1m])
+```
+
+Successful Rate:
+
+```
+sum(irate(istio_requests_total{reporter="source",destination_service="spring-boot-helloworld.default.svc.cluster.local",response_code!~"5.*"}[1m]))/sum(irate(istio_requests_total{reporter="source",destination_service="spring-boot-helloworld.default.svc.cluster.local"}[1m]))
+```
+
 
 #### Rollout
 
 ```bash
-kubectl argo rollouts set image rollouts-helloworld-with-analysis spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.5 -n demo 
+kubectl argo rollouts set image rollouts-helloworld-with-analysis spring-boot-helloworld=ikubernetes/spring-boot-helloworld:v0.9.6 -n demo 
 ```

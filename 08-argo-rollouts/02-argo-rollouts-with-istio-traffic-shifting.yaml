@@ -19,10 +19,13 @@ spec:
             canarySubsetName: canary  # required
             stableSubsetName: stable  # required
       steps:
+      - setCanaryScale:
+          matchTrafficWeight: true
       - setWeight: 5
       - pause: {duration: 1m}
       - setWeight: 10
       - pause: {duration: 1m}
+      - pause: {duration: 20}
       - setWeight: 20
       - pause: {duration: 40}
       - setWeight: 40
@@ -42,7 +45,7 @@ spec:
     spec:
       containers:
       - name: spring-boot-helloworld
-        image: ikubernetes/spring-boot-helloworld:v0.9.4
+        image: ikubernetes/spring-boot-helloworld:v0.9.5
         ports:
         - name: http
           containerPort: 80
