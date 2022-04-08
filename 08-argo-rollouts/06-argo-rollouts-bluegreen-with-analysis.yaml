@@ -1,0 +1,87 @@
+# CopyRight: MageEdu <http://www.magedu.com>
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    successCondition: result[0] >= 0.95
+    interval: 20s 
+    count: 5
+    failureLimit: 5
+    provider:
+      prometheus:
+        address: http://prometheus.istio-system.svc.cluster.local:9090
+        query: |
+          sum(irate(
+            istio_requests_total{reporter="source",destination_service=~"{{args.service-name}}",response_code!~"5.*"}[1m]
+          )) / 
+          sum(irate(
+            istio_requests_total{reporter="source",destination_service=~"{{args.service-name}}"}[1m]
+          ))
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollout-helloworld-bluegreen-with-analysis
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: rollout-helloworld-bluegreen
+  template:
+    metadata:
+      labels:
+        app: rollout-helloworld-bluegreen
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: ikubernetes/spring-boot-helloworld:v0.9.5
+        ports:
+        - containerPort: 80
+  strategy:
+    blueGreen: 
+      activeService: spring-boot-helloworld
+      previewService: spring-boot-helloworld-preview
+      prePromotionAnalysis: 
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: spring-boot-helloworld.demo.svc.cluster.local
+      postPromotionAnalysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: spring-boot-helloworld.demo.svc.cluster.local
+      autoPromotionEnabled: true
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-helloworld
+spec:
+  selector:
+    app: rollout-helloworld-bluegreen
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-helloworld-preview
+spec:
+  selector:
+    app: rollout-helloworld-bluegreen
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
