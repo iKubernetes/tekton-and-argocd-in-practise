@@ -17,11 +17,11 @@ spec:
       description: The version of the application
       type: string
       default: "v0.9" 
-  results:
-    - name: datetime
-      description: The current date and time
-    - name: buildId
-      description: The build ID
+  #results:
+  #  - name: datetime
+  #    description: The current date and time
+  #  - name: buildId
+  #    description: The build ID
   workspaces:
     - name: codebase
     - name: docker-config

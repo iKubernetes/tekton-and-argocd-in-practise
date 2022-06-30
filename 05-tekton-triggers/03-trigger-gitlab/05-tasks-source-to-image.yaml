@@ -19,7 +19,7 @@ spec:
       description: The git repo will be cloned onto the volume backing this workspace
   steps:
     - name: git-clone
-      image: alpine/git:v2.32.0
+      image: alpine/git:v2.36.1
       script: | 
         git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
         cd $(workspaces.source.path)/source && git reset --hard $(params.git-revision)
@@ -125,7 +125,7 @@ spec:
       description: Image tag
   steps:
     - name: update-yaml
-      image: alpine:3.15
+      image: alpine:3.16
       command: ["sed"]
       args:
         - "-i"

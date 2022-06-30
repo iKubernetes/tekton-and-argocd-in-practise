@@ -3,6 +3,7 @@ kind: PipelineRun
 metadata:
   name: s2i-buildid-run-00002
 spec:
+  serviceAccountName: default
   serviceAccountNames:
     - taskName: deploy-to-cluster
       serviceAccountName: helloworld-admin
@@ -10,7 +11,8 @@ spec:
     name: source-to-image
   params:
     - name: git-url
-      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      #value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloWorld.git
     - name: image-url
       value: ikubernetes/spring-boot-helloworld
     - name: version

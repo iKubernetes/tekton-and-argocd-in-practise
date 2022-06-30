@@ -1,11 +1,12 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: s2i-buildid-run-00001
+  name: s2i-buildid-run-10001
 spec:
-  serviceAccountNames:
-    - taskName: deploy-to-cluster
-      serviceAccountName: helloworld-admin
+  serviceAccountName: helloworld-admin
+  #serviceAccountNames:
+  #  - taskName: deploy-to-cluster
+  #    serviceAccountName: helloworld-admin
   pipelineRef:
     name: source-to-image
   params:

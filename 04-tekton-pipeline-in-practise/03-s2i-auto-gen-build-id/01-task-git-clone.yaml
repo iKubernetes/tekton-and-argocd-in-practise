@@ -8,10 +8,15 @@ spec:
     - name: url
       type: string
       description: git url to clone
+      default: ""
+    - name: branch
+      type: string
+      description: git branch to checkout
+      default: "main"
   workspaces:
     - name: source
       description: The git repo will be cloned onto the volume backing this workspace
   steps:
     - name: git-clone
-      image: alpine/git:v2.32.0
-      script: git clone -v $(params.url) $(workspaces.source.path)/source
+      image: alpine/git:v2.36.1
+      script: git clone -b $(params.branch) -v $(params.url) $(workspaces.source.path)/source

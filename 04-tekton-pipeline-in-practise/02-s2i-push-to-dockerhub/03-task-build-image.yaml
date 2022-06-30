@@ -16,6 +16,7 @@ spec:
   workspaces:
     - name: source
     - name: dockerconfig
+      # Secret resource which contains identity to image registry
       mountPath: /kaniko/.docker
   steps:
     - name: image-build-and-push

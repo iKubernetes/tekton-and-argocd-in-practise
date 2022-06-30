@@ -11,10 +11,10 @@ spec:
   - name: source
   steps:
   - name: git-clone
-    image: alpine/git:v2.32.0
+    image: alpine/git:v2.36.1
     script: git clone -v $(params.git-repo) $(workspaces.source.path)/source
   - name: list-files
-    image: alpine:3.15
+    image: alpine:3.16
     command:
     - /bin/sh
     args:

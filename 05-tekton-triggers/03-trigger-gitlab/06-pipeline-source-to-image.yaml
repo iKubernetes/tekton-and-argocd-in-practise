@@ -23,11 +23,11 @@ spec:
     - name: deploy-config-file
       description: The path to the yaml file to deploy within the git source
       default: all-in-one.yaml
-  results:
-    - name: datetime
-      description: The current date and time
-    - name: buildId
-      description: The build ID
+  #results:
+  #  - name: datetime
+  #    description: The current date and time
+  #  - name: buildId
+  #    description: The build ID
   workspaces:
     - name: codebase
     - name: docker-config

@@ -9,7 +9,7 @@ spec:
     default: MageEdu
   steps:
     - name: write-message
-      image: alpine:3.15
+      image: alpine:3.16
       script: |
         #!/bin/sh
         set -xe

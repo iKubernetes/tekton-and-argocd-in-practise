@@ -11,7 +11,7 @@ spec:
       description: code storage
   steps:
     - name: fetch-from-source
-      image: alpine/git:v2.32.0
+      image: alpine/git:v2.36.1
       script: |
         git clone $(params.git-repo-url) $(workspaces.source.path)/source
     - name: build-to-package

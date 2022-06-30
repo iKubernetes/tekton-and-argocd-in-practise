@@ -20,7 +20,7 @@ spec:
           - name: url
         steps:
           - name: git-clone
-            image: alpine/git:v2.32.0
+            image: alpine/git:v2.36.1
             script: git clone -v $(params.url) $(workspaces.source.path)/source
       workspaces:
         - name: source
@@ -31,7 +31,7 @@ spec:
       taskSpec:
         steps:
           - name: list-files
-            image: alpine:3.15
+            image: alpine:3.16
             script: ls $(workspaces.source.path)/source
         workspaces:
           - name: source
@@ -48,7 +48,8 @@ spec:
     name: volume-share
   params:
     - name: git-url
-      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      #value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      value: http://code.gitlab.svc/root/spring-boot-helloWorld.git
   workspaces:
     - name: codebase
       volumeClaimTemplate:

@@ -20,8 +20,8 @@ spec:
       - name: source
     steps:
       - name: fetch-from-git-repo
-        image: alpine/git:v2.32.0
+        image: alpine/git:v2.36.1
         script: git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
       - name: list-files
-        image: alpine:3.15
+        image: alpine:3.16
         script: ls -la $(workspaces.source.path)/source

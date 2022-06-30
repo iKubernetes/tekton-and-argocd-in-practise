@@ -14,9 +14,10 @@ spec:
     metadata:
       generateName: s2i-trigger-run-  # TaskRun 名称前缀
     spec:
-      serviceAccountNames:
-        - taskName: deploy-to-cluster
-          serviceAccountName: helloworld-admin
+      serviceAccountName: helloworld-admin
+      #serviceAccountNames:
+      #  - taskName: deploy-to-cluster
+      #    serviceAccountName: helloworld-admin
       pipelineRef:
         name: source-to-image
       params:
