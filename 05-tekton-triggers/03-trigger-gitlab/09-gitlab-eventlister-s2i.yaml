@@ -15,7 +15,10 @@ spec:
           secretName: gitlab-webhook-token 
           secretKey: webhookToken
       - name: "eventTypes"
-        value: ["Push Hook"]
+        value: 
+          - "Push Hook"
+          - "Tag Push Hook"
+          - "Merge Request Hook"
     bindings:
     - ref: s2i-binding
     template:
