@@ -3,12 +3,18 @@ kind: PipelineRun
 metadata:
   name: s2i-buildid-run-10001
 spec:
-  serviceAccountName: helloworld-admin
+  serviceAccountName: default
   #serviceAccountNames:
   #  - taskName: deploy-to-cluster
   #    serviceAccountName: helloworld-admin
   pipelineRef:
     name: source-to-image
+  taskRunSpecs:
+    - pipelineTaskName: deploy-to-cluster
+      taskServiceAccountName: helloworld-admin
+  #    taskPodTemplate:
+  #      nodeSelector:
+  #        disktype: ssd
   params:
     - name: git-repo-url
       value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloworld.git
