@@ -15,13 +15,30 @@ NFS CSI driver is a project for [NFS](https://en.wikipedia.org/wiki/Network_File
 |v3.1.0          | 1.19+                 | beta   |
 
 ### Install driver on a Kubernetes cluster
- - install by [kubectl](https://github.com/kubernetes-csi/csi-driver-nfs/docs/install-nfs-csi-driver.md)
- - install by [helm charts](https://github.com/kubernetes-csi/csi-driver-nfs/charts)
+ - install by [kubectl](https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/docs/install-nfs-csi-driver.md)
+ - install by [helm charts](https://github.com/kubernetes-csi/csi-driver-nfs/tree/master/charts)
 
-### Driver parameters
-Please refer to [`nfs.csi.k8s.io` driver parameters](https://github.com/kubernetes-csi/csi-driver-nfs/docs/driver-parameters.md)
+### storage class usage (dynamic provisioning)
+> [`StorageClass` example](https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/deploy/example/storageclass-nfs.yaml)
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-csi
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: nfs-server.nfs.svc.cluster.local
+  share: /
+  # csi.storage.k8s.io/provisioner-secret is only needed for providing mountOptions in DeleteVolume
+  # csi.storage.k8s.io/provisioner-secret-name: "mount-options"
+  # csi.storage.k8s.io/provisioner-secret-namespace: "default"
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
+  - hard
+```
 
 ### Examples
- - [Basic usage](https://github.com/kubernetes-csi/csi-driver-nfs/deploy/example/README.md)
- - [fsGroupPolicy](https://github.com/kubernetes-csi/csi-driver-nfs/deploy/example/fsgroup)
-
+ - [Basic usage](https://github.com/kubernetes-csi/csi-driver-nfs/blob/master/deploy/example/README.md)
