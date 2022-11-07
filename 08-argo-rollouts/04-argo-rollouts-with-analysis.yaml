@@ -13,7 +13,7 @@ spec:
     # So it is common to access the index 0 of the returned array to obtain the value
     successCondition: result[0] >= 0.95
     interval: 20s 
-    #count: 3
+    count: 3
     failureLimit: 3
     provider:
       prometheus:
@@ -70,7 +70,7 @@ spec:
     spec:
       containers:
       - name: spring-boot-helloworld
-        image: ikubernetes/spring-boot-helloworld:v0.9.5
+        image: ikubernetes/spring-boot-helloworld:v0.9.2
         ports:
         - name: http
           containerPort: 80
