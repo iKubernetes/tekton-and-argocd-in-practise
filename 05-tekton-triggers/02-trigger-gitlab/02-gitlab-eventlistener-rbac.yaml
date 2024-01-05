@@ -11,17 +11,46 @@ metadata:
   name: tekton-triggers-gitlab-minimal
 rules:
   # Permissions for every EventListener deployment to function
-  - apiGroups: ["triggers.tekton.dev"]
-    resources: ["eventlisteners", "triggerbindings", "triggertemplates"]
-    verbs: ["get"]
-  - apiGroups: [""]
+- apiGroups: ["triggers.tekton.dev"]
+  resources: 
+  - eventlisteners
+  - triggerbindings
+  - interceptors
+  - triggertemplates
+  - triggers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: [""]
     # secrets are only needed for Github/Gitlab interceptors, serviceaccounts only for per trigger authorization
-    resources: ["configmaps", "secrets", "serviceaccounts"]
-    verbs: ["get", "list", "watch"]
+  resources: 
+  - "configmaps"
+  - "secrets"
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - impersonate
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
   # Permissions to create resources in associated TriggerTemplates
-  - apiGroups: ["tekton.dev"]
-    resources: ["pipelineruns", "pipelineresources", "taskruns"]
-    verbs: ["create"]
+- apiGroups: ["tekton.dev"]
+  resources:
+  - pipelineruns
+  - pipelineresources
+  - taskruns
+  verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -40,9 +69,23 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: tekton-triggers-gitlab-minimal
 rules:
-  - apiGroups: ["triggers.tekton.dev"]
-    resources: ["clusterinterceptors"]
-    verbs: ["get", "list"]
+- apiGroups:
+  - triggers.tekton.dev
+  resources:
+  - clustertriggerbindings
+  - clusterinterceptors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
