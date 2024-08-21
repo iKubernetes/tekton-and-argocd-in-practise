@@ -1,4 +1,4 @@
-# Tekton Dashboard
+# 部署Tekton Pipelines和Dashboard
 
 
 
@@ -9,7 +9,7 @@
 >    ```
 >    # Tekton Pipelines
 >    kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
->    
+>       
 >    # Tekton Dashboard
 >    kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
 >    ```
