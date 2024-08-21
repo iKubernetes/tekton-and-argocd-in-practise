@@ -1,0 +1,23 @@
+---
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: tekton-dashboard
+  namespace: tekton-pipelines
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: contour
+    namespace: projectcontour
+  hostnames:
+  - "tekton.magedu.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - kind: Service
+      name: tekton-dashboard
+      port: 9097
