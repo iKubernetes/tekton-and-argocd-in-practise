@@ -9,7 +9,7 @@
 >    ```
 >    # Tekton Pipelines
 >    kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
->       
+>          
 >    # Tekton Dashboard
 >    kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
 >    ```
@@ -28,9 +28,9 @@
 
 本目录中的示例提供了三种暴露Tekton Dashboard至集群外部的方式，根据需要选择其中之一即可。
 
-- 基于Ingress：默认使用的是Contour Ingress Class
-- 基于Kubernetes Gateway：默认使用的是Contour Gateway
-- 基于Istio Gateway
+- 基于Ingress：默认使用的是Contour Ingress Class，依赖于部署的ProjectContour
+- 基于Kubernetes Gateway：默认使用的是Contour Gateway，依赖于部署的ProjectContour
+- 基于Istio Gateway：依赖于部署的Istio
 
 
 
