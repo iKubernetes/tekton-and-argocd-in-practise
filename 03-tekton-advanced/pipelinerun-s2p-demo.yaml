@@ -1,5 +1,5 @@
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: s2p-demo-run-00001
@@ -18,4 +18,4 @@ spec:
           resources:
             requests:
               storage: 1Gi
-          storageClassName: nfs-csi
+          storageClassName: openebs-hostpath

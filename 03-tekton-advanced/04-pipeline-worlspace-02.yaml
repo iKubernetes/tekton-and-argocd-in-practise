@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: volume-share
@@ -20,7 +20,7 @@ spec:
           - name: url
         steps:
           - name: git-clone
-            image: alpine/git:v2.36.1
+            image: alpine/git:v2.45.2
             script: git clone -v $(params.url) $(workspaces.source.path)/source
       workspaces:
         - name: source
@@ -31,7 +31,7 @@ spec:
       taskSpec:
         steps:
           - name: list-files
-            image: alpine:3.16
+            image: alpine:3.20
             script: ls $(workspaces.source.path)/source
         workspaces:
           - name: source
@@ -39,7 +39,7 @@ spec:
         - name: source
           workspace: codebase
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: volume-share-run-xxxx
@@ -48,8 +48,8 @@ spec:
     name: volume-share
   params:
     - name: git-url
-      #value: https://gitee.com/mageedu/spring-boot-helloWorld.git
-      value: http://code.gitlab.svc/root/spring-boot-helloWorld.git
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      #value: http://code.gitlab.svc/root/spring-boot-helloWorld.git
   workspaces:
     - name: codebase
       volumeClaimTemplate:
@@ -59,4 +59,4 @@ spec:
           resources:
             requests:
               storage: 1Gi
-          storageClassName: nfs-csi
+          storageClassName: openebs-hostpath

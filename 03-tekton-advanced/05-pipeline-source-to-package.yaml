@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: source-2-package
@@ -20,7 +20,7 @@ spec:
           - name: url
         steps:
           - name: git-clone
-            image: alpine/git:v2.36.1
+            image: alpine/git:v2.45.2
             script: git clone -v $(params.url) $(workspaces.source.path)/source
       workspaces:
         - name: source
@@ -31,9 +31,12 @@ spec:
       taskSpec:
         steps:
           - name: build
-            image: maven:3.8-openjdk-11-slim
+            #image: maven:3.8-openjdk-11-slim
+            image: maven:3.8.7-eclipse-temurin-11-alpine
             workingDir: $(workspaces.source.path)/source
             script: |
+              #curl -sL https://gitee.com/mageedu/spring-boot-helloWorld/raw/main/maven/settings.xml -o /usr/share/maven/conf/settings.xml
+              cat maven/settings.xml > /usr/share/maven/conf/settings.xml
               mvn clean install
         workspaces:
           - name: source
@@ -41,7 +44,7 @@ spec:
         - name: source
           workspace: codebase
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: source-2-package-run-001
@@ -50,8 +53,8 @@ spec:
     name: source-2-package
   params:
     - name: git-url
-      #value: https://gitee.com/mageedu/spring-boot-helloWorld.git
-      value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloWorld.git
+      value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      #value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloWorld.git
   workspaces:
     - name: codebase
       volumeClaimTemplate:
@@ -61,4 +64,4 @@ spec:
           resources:
             requests:
               storage: 1Gi
-          storageClassName: nfs-csi
+          storageClassName: openebs-hostpath

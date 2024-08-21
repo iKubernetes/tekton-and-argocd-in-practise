@@ -20,3 +20,24 @@ spec:
       script: |
         curl -sL https://gitee.com/mageedu/spring-boot-helloWorld/raw/main/maven/settings.xml -o /usr/share/maven/conf/settings.xml
         mvn clean install
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: s2p-demo
+spec:
+  params:
+    - name: git-repo-url
+      type: string
+  workspaces:
+    - name: source
+  tasks:
+    - name: source-to-package
+      params:
+        - name: git-repo-url
+          value: $(params.git-repo-url)
+      workspaces:
+        - name: source
+          workspace: source
+      taskRef:
+        name: source-to-package

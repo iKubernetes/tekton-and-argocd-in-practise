@@ -1,43 +1,17 @@
 # Pipeline and Task
 
-## NFS-CSI
+为测试环境准备StorageClass，本示例以OpenEBS项目提供的openebs-hostpath为例。
 
-### Install NFS Server
-```
-kubectl create -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/example/nfs-provisioner/nfs-server.yaml
-```
+### 部署OpenEBS 3.10.x
 
-### Install NFS-CSI Driver
-```
-curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/install-driver.sh | bash -s master --
-```
+请参考[这篇文档](https://github.com/iKubernetes/learning-k8s/tree/master/OpenEBS)中的说明。本示例中的maven-cache需要用到“RWX”的访问模式，建议同时部署“OpenEBS Dynamic NFS Provider”。
 
-check pods status
-```
-kubectl -n kube-system get pod -o wide -l app=csi-nfs-controller
-kubectl -n kube-system get pod -o wide -l app=csi-nfs-node
+### 部署OpenEBS 4.x
+
+```bash
+helm install openebs --namespace openebs openebs/openebs --set engines.replicated.mayastor.enabled=false \
+            --set engines.local.zfs.enabled=false --create-namespace
 ```
 
-### Storage Class Usage (Dynamic Provisioning)
 
-Follow the following command to create a StorageClass, and then PersistentVolume and PersistentVolumeClaim dynamically.
 
-```
-# create StorageClass
-kubectl create -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/example/storageclass-nfs.yaml
-
-# create PVC
-kubectl create -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/example/pvc-nfs-csi-dynamic.yaml
-```
-
-### PV/PVC Usage (Static Provisioning)
-
-Follow the following command to create PersistentVolume and PersistentVolumeClaim statically.
-
-```
-# create PV
-kubectl create -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/example/pv-nfs-csi.yaml
-
-# create PVC
-kubectl create -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/example/pvc-nfs-csi-static.yaml
-```
