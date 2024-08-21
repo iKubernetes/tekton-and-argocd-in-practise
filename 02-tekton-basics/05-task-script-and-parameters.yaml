@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: logger
@@ -10,9 +10,10 @@ spec:
       default: "-"
   steps:
     - name: log
-      image: alpine:3.15
+      image: alpine:3.20
       script: |
-        apk add -q tzdata
+        sed -i "s@https://dl-cdn.alpinelinux.org/@https://mirrors.huaweicloud.com/@g" /etc/apk/repositories
+        apk update && apk add -q tzdata
         cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
         DATETIME=$(date "+%F %T")
         echo [$DATETIME] - $(params.text)

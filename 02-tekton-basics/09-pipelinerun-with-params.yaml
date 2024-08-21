@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: pipeline-with-params-run-xxxxx
@@ -11,5 +11,3 @@ spec:
     value: "Something has happened ~~."
   pipelineRef:
     name: pipeline-with-params
-  serviceAccountName: default
-  timeout: 10m0s
