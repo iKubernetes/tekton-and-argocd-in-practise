@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: s2i-no-push-run-00001
@@ -8,6 +8,7 @@ spec:
   params:
     - name: git-url
       #value: https://gitee.com/mageedu/spring-boot-helloWorld.git
+      # 从本地仓库克隆代码，其Dockerfile中引用的Image修改为可访问的位置
       value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloWorld.git
     - name: image-url
       value: ikubernetes/spring-boot-helloworld
@@ -22,4 +23,4 @@ spec:
           resources:
             requests:
               storage: 1Gi
-          storageClassName: nfs-csi
+          storageClassName: openebs-hostpath
