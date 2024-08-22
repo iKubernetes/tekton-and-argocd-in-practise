@@ -3,9 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: maven-cache
 spec:
-  storageClassName: openebs-hostpath
+  storageClassName: openebs-rwx
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 5Gi
