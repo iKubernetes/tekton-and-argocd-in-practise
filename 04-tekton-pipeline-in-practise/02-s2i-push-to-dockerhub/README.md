@@ -21,7 +21,7 @@ Create a `config.json` file with your Docker registry url and the previous gener
 
 > 注意：此处的文件名将作为Secret中的key，其挂载后代表的文件名要求必须为config.json，因此，若使用了其它的文件名，则必须要在创建Secret对象时，将其key明确定义为config.json。
 
-**Note:** Please use v1 endpoint. See #1209 for more details
+**Note:** 如果是Docker Hub，Please use v1 endpoint，如果是自行部署的私有Registry，例如Harbor，可直接使用服务器地址，形如“https://registry.magedu.com/”即可。
 
 ```
 {
@@ -38,7 +38,8 @@ Configure credentials
     You can create a Kubernetes secret for your `~/.docker/config.json` file so that credentials can be accessed within the cluster.
     To create the secret, run:
         ```shell
-        kubectl create secret generic docker-config --from-file=<path to .docker/config.json>
+        kubectl create secret generic registry-credential --from-file=config.json=<path to .docker/config.json>
         ```
     
-    **注意：** Secret的类型必须为“generic”，一定不能使用“docker-registry”。
+    注意： Secret的类型必须为“generic”，一定不能使用“docker-registry”。
+
