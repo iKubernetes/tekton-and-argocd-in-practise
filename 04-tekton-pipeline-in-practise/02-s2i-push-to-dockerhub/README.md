@@ -2,7 +2,7 @@
 
 ### Kaniko
 
-![kaniko logo](logo/Kaniko-Logo.png)
+![kaniko logo](https://github.com/GoogleContainerTools/kaniko/blob/main/logo/Kaniko-Logo.png)
 
 kaniko is a tool to build container images from a Dockerfile, inside a container or Kubernetes cluster.
 
@@ -18,6 +18,8 @@ Get your docker registry user and password encoded in base64
     echo -n USER:PASSWORD | base64
 
 Create a `config.json` file with your Docker registry url and the previous generated base64 string
+
+> 注意：此处的文件名将作为Secret中的key，其挂载后代表的文件名要求必须为config.json，因此，若使用了其它的文件名，则必须要在创建Secret对象时，将其key明确定义为config.json。
 
 **Note:** Please use v1 endpoint. See #1209 for more details
 
@@ -38,5 +40,5 @@ Configure credentials
         ```shell
         kubectl create secret generic docker-config --from-file=<path to .docker/config.json>
         ```
-
-    **Note:** The type of secret must use generic, and must **not** be docker-registry.
+    
+    **注意：** Secret的类型必须为“generic”，一定不能使用“docker-registry”。

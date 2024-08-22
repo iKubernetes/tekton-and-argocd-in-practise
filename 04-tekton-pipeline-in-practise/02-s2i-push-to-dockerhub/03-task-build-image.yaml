@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: image-build-and-push
@@ -21,6 +21,7 @@ spec:
   steps:
     - name: image-build-and-push
       image: gcr.io/kaniko-project/executor:debug
+      #image: gcr.io/kaniko-project/executor:v1.23.2
       securityContext:
         runAsUser: 0
       env:
@@ -31,4 +32,9 @@ spec:
       args:
         - --dockerfile=$(params.dockerfile)
         - --context=$(workspaces.source.path)/source
+        - --insecure
+        - --insecure-pull
+        - --skip-tls-verify
+        - --skip-tls-verify-pull
+        - --skip-push-permission-check
         - --destination=$(params.image-url):$(params.image-tag)
