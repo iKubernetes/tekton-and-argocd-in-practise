@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: git-clone
@@ -18,5 +18,5 @@ spec:
       description: The git repo will be cloned onto the volume backing this workspace
   steps:
     - name: git-clone
-      image: alpine/git:v2.36.1
+      image: alpine/git:v2.45.2
       script: git clone -b $(params.branch) -v $(params.url) $(workspaces.source.path)/source

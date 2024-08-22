@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-to-package
@@ -9,12 +9,15 @@ spec:
       description: The git repo that cloned onto the volume backing this workspace
   steps:
     - name: build
-      image: maven:3.8-openjdk-11-slim
+      #image: maven:3.8-openjdk-11-slim
+      image: maven:3.8.7-eclipse-temurin-11-alpine
       workingDir: $(workspaces.source.path)/source
       volumeMounts:
         - name: m2
           mountPath: /root/.m2
-      script: mvn clean install
+      script: |
+        curl -sL https://gitee.com/mageedu/spring-boot-helloWorld/raw/main/maven/settings.xml -o /usr/share/maven/conf/settings.xml
+        mvn clean install
   volumes:
     - name: m2
       persistentVolumeClaim:

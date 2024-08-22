@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: deploy-using-kubectl
@@ -15,7 +15,7 @@ spec:
       description: Image tag
   steps:
     - name: update-yaml
-      image: alpine:3.16
+      image: alpine:3.20
       command: ["sed"]
       args:
         - "-i"
@@ -23,7 +23,8 @@ spec:
         - "s@__IMAGE__@$(params.image-url):$(params.image-tag)@g"
         - "$(workspaces.source.path)/source/deploy/$(params.deploy-config-file)"
     - name: run-kubectl
-      image: lachlanevenson/k8s-kubectl
+      #image: lachlanevenson/k8s-kubectl
+      image: bitnami/kubectl
       command: ["kubectl"]
       args:
         - "apply"
