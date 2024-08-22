@@ -9,24 +9,16 @@ spec:
   - name: image-url
   - name: version
   resourcetemplates:
-  - apiVersion: tekton.dev/v1beta1
+  - apiVersion: tekton.dev/v1
     kind: PipelineRun
     metadata:
       generateName: s2i-trigger-run-  # TaskRun 名称前缀
     spec:
-      serviceAccountName: default
-      ## PipelineRun.Spec.ServiceAccountNames field is deprecated; use PipelineRun.Spec.TaskRunSpecs instead.
-      #serviceAccountNames:
-      #  - taskName: deploy-to-cluster
-      #    serviceAccountName: helloworld-admin
       pipelineRef:
         name: source-to-image
       taskRunSpecs:
         - pipelineTaskName: deploy-to-cluster
-          taskServiceAccountName: helloworld-admin
-      #    taskPodTemplate:
-      #      nodeSelector:
-      #        disktype: ssd
+          serviceAccountName: helloworld-admin
       params:
         - name: git-repo-url
           value: $(tt.params.git-repo-url)
@@ -45,7 +37,7 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
-              storageClassName: nfs-csi
+              storageClassName: openebs-hostpath
         - name: docker-config
           secret:
-            secretName: docker-config
+            secretName: registry-credential

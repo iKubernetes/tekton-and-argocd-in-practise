@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: TaskRun
 metadata:
   name: gitlab-run-00001  # TaskRun 名称前缀
@@ -20,8 +20,8 @@ spec:
       - name: source
     steps:
       - name: fetch-from-git-repo
-        image: alpine/git:v2.36.1
+        image: alpine/git:v2.45.2
         script: git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
       - name: list-files
-        image: alpine:3.16
+        image: alpine:3.20
         script: ls -la $(workspaces.source.path)/source

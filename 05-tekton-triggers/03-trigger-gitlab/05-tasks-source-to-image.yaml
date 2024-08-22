@@ -1,7 +1,7 @@
 # Maintainer: MageEdu "<mage@magedu.com>"
 # Version: v1.0.1
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: git-clone
@@ -19,12 +19,12 @@ spec:
       description: The git repo will be cloned onto the volume backing this workspace
   steps:
     - name: git-clone
-      image: alpine/git:v2.36.1
+      image: alpine/git:v2.45.2
       script: | 
         git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
         cd $(workspaces.source.path)/source && git reset --hard $(params.git-revision)
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: build-to-package
@@ -35,18 +35,21 @@ spec:
       description: The git repo that cloned onto the volume backing this workspace
   steps:
     - name: build
-      image: maven:3.8-openjdk-11-slim
+      #image: maven:3.8-openjdk-11-slim
+      image: maven:3.8.7-eclipse-temurin-11-alpine
       workingDir: $(workspaces.source.path)/source
       volumeMounts:
         - name: m2
           mountPath: /root/.m2
-      script: mvn clean install
+      script: |
+        curl -sL https://gitee.com/mageedu/spring-boot-helloWorld/raw/main/maven/settings.xml -o /usr/share/maven/conf/settings.xml
+        mvn clean install
   volumes:
     - name: m2
       persistentVolumeClaim:
         claimName: maven-cache
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: generate-build-id
@@ -75,7 +78,7 @@ spec:
         buildId=$(params.version)-${buildDatetime}
         echo -n ${buildId} | tee $(results.buildId.path)
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: image-build-and-push
@@ -95,7 +98,8 @@ spec:
       mountPath: /kaniko/.docker
   steps:
     - name: image-build-and-push
-      image: gcr.io/kaniko-project/executor:debug
+      #image: gcr.io/kaniko-project/executor:debug
+      image: gcr.io/kaniko-project/executor:v1.23.2
       securityContext:
         runAsUser: 0
       env:
@@ -106,9 +110,14 @@ spec:
       args:
         - --dockerfile=$(params.dockerfile)
         - --context=$(workspaces.source.path)/source
+        - --insecure
+        - --insecure-pull
+        - --skip-tls-verify
+        - --skip-tls-verify-pull
+        - --skip-push-permission-check
         - --destination=$(params.image-url):$(params.image-tag)
 ---
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: deploy-using-kubectl
@@ -125,7 +134,7 @@ spec:
       description: Image tag
   steps:
     - name: update-yaml
-      image: alpine:3.16
+      image: alpine:3.20
       command: ["sed"]
       args:
         - "-i"
@@ -133,7 +142,8 @@ spec:
         - "s@__IMAGE__@$(params.image-url):$(params.image-tag)@g"
         - "$(workspaces.source.path)/source/deploy/$(params.deploy-config-file)"
     - name: run-kubectl
-      image: lachlanevenson/k8s-kubectl
+      #image: lachlanevenson/k8s-kubectl
+      image: bitnami/kubectl
       command: ["kubectl"]
       args:
         - "apply"

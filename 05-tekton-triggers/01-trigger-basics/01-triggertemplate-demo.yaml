@@ -1,4 +1,4 @@
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: pipeline-template-demo
@@ -14,7 +14,7 @@ spec:
     - name: version
       description: The version of application
   resourcetemplates:
-    - apiVersion: tekton.dev/v1beta1
+    - apiVersion: tekton.dev/v1
       kind: PipelineRun
       metadata:
         generateName: pipeline-run-
@@ -37,7 +37,7 @@ spec:
                 resources:
                   requests:
                     storage: 1Gi
-                storageClassName: nfs-csi
+                storageClassName: openebs-hostpath
           - name: docker-config
             secret:
-              secretName: docker-config
+              secretName: registry-credential

@@ -7,7 +7,7 @@ spec:
   - name: git-revision
   - name: git-repo-url
   resourcetemplates:
-  - apiVersion: tekton.dev/v1beta1
+  - apiVersion: tekton.dev/v1
     kind: TaskRun
     metadata:
       generateName: gitlab-trigger-run-  # TaskRun 名称前缀
@@ -29,10 +29,10 @@ spec:
           - name: git-repo-url
         steps:
           - name: fetch-from-git-repo
-            image: alpine/git:v2.36.1
+            image: alpine/git:v2.45.2
             script: |
               git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
               cd $(workspaces.source.path)/source && git reset --hard $(params.git-revision)
           - name: list-files
-            image: alpine:3.16
+            image: alpine:3.20
             script: ls -la $(workspaces.source.path)/source
