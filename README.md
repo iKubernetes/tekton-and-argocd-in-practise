@@ -13,3 +13,7 @@
 - [当当直达](http://search.dangdang.com/?key=kubernetes%BD%F8%BD%D7%CA%B5%D5%BD%B5%DA%B6%FE%B0%E6&act=input)
 
 ![图书封面](https://github.com/iKubernetes/Kubernetes_Advanced_Practical_2rd/raw/main/imgs/book.jpg)
+
+## 版权声明
+
+本文档由[马哥教育](http://www.magedu.com)开发，允许自由转载，但必须保留马哥教育及相关的一切标识。另外，商用需要征得马哥教育的书面同意。
