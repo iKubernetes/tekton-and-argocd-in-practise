@@ -120,6 +120,16 @@ kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/rele
 kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/dashboard-install.yaml
 ```
 
+#### 开放Rollouts Dashboard
+
+下面命令，会基于Ingress Nginx创建一个ingress资源对象来开放rollout，其使用的主机名为“argo-rollouts.magedu.com”。
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/iKubernetes/tekton-and-argocd-in-practise/main/06-deploy-argocd/argo-rollouts/argo-rollouts-ingress.yaml
+```
+
+> 提示：访问Rollouts Dashboard时，若要管理指定名称空间下的Rollout，可以在访问的路径上使用“/rollouts/<NAMESPACE>”。
+
 
 
 ### 安装kubectl argo rollout插件
