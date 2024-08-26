@@ -38,7 +38,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v$
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-#### Ingress （Ingress Cilium）
+#### Ingress （Ingress Nginx）
 
 ```
 apiVersion: networking.k8s.io/v1
@@ -47,15 +47,15 @@ metadata:
   name: argocd-server-ingress
   namespace: argocd
   annotations:
-    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    #nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    ingress.cilium.io/loadbalancer-mode: 'shared'
-    ingress.cilium.io/service-type: 'LoadBalancer'
-    ingress.cilium.io/tls-passthrough: 'enabled'
-    ingress.cilium.io/force-https: 'enabled'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    #ingress.cilium.io/loadbalancer-mode: 'shared'
+    #ingress.cilium.io/service-type: 'LoadBalancer'
+    #ingress.cilium.io/tls-passthrough: 'enabled'
+    #ingress.cilium.io/force-https: 'enabled'
 spec:
-  ingressClassName: cilium
+  ingressClassName: nginx
   rules:
   - host: argocd.magedu.com
     http:
