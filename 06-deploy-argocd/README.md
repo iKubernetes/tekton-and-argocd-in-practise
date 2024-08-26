@@ -49,6 +49,7 @@ metadata:
   annotations:
     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    #nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     ingress.cilium.io/loadbalancer-mode: 'shared'
     ingress.cilium.io/service-type: 'LoadBalancer'
     ingress.cilium.io/tls-passthrough: 'enabled'
