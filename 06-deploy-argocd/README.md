@@ -127,8 +127,8 @@ kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/rele
 
 ```bash
 curl -LO https://github.com/argoproj/argo-rollouts/releases/download/v1.7.2/kubectl-argo-rollouts-linux-amd64
-sudo install -m 555 kubectl-argo-rollouts-darwin-amd64 /usr/local/bin/kubectl-argo-rollouts
-rm kubectl-argo-rollouts-darwin-amd64
+sudo install -m 555 kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+rm kubectl-argo-rollouts-linux-amd64
 ```
 
 运行命令进行测试。
