@@ -1,0 +1,109 @@
+# CopyRight: MageEdu <http://www.magedu.com>
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+  - name: service-name
+  - name: namespace
+  metrics:
+  - name: success-rate
+    # NOTE: prometheus queries return results in the form of a vector.
+    # So it is common to access the index 0 of the returned array to obtain the value
+    successCondition: result[0] >= 0.95
+    interval: 20s
+    count: 3
+    failureLimit: 3
+    provider:
+      prometheus:
+        address: http://prometheus.prom.svc.cluster.local:9090
+        query: |
+          sum(irate(nginx_ingress_controller_requests{service=~"{{args.service-name}}",namespace=~"{{args.namespace}}",status!~"[4-5].*"}[1m])) /
+          sum(irate(nginx_ingress_controller_requests{service=~"{{args.service-name}}",namespace=~"{{args.namespace}}"}[1m]))
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollout-helloworld-bluegreen-with-analysis
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: rollout-helloworld-bluegreen
+  template:
+    metadata:
+      labels:
+        app: rollout-helloworld-bluegreen
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: ikubernetes/spring-boot-helloworld:v0.9.2
+        ports:
+        - containerPort: 80
+  strategy:
+    blueGreen: 
+      activeService: spring-boot-helloworld
+      previewService: spring-boot-helloworld-preview
+      prePromotionAnalysis: 
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: spring-boot-helloworld
+        - name: namespace
+          value: default
+      postPromotionAnalysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: spring-boot-helloworld
+        - name: namespace
+          value: default
+      autoPromotionEnabled: true
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-helloworld
+spec:
+  selector:
+    app: rollout-helloworld-bluegreen
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spring-boot-helloworld-preview
+spec:
+  selector:
+    app: rollout-helloworld-bluegreen
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-boot-helloworld
+spec:
+  ingressClassName: "nginx"
+  rules:
+    - host: hello.magedu.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spring-boot-helloworld
+                port:
+                  number: 80
+---

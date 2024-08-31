@@ -1,0 +1,108 @@
+# CopyRight: MageEdu <mage@magedu.com>
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-helloworld-with-traffic-shifting
+spec:
+  replicas: 10 
+  strategy:
+    canary:
+      canaryService: spring-boot-helloworld-canary
+      stableService: spring-boot-helloworld
+      trafficRouting:
+        nginx:
+          stableIngress: spring-boot-helloworld
+      steps:
+      - setCanaryScale:
+          matchTrafficWeight: true
+      - setWeight: 5
+      - pause: {duration: 1m}
+      - setWeight: 10
+      - pause: {duration: 1m}
+      - pause: {duration: 20}
+      - setWeight: 20
+      - pause: {duration: 40}
+      - setWeight: 40
+      - pause: {duration: 20}
+      - setWeight: 60
+      - pause: {duration: 20}
+      - setWeight: 80
+      - pause: {duration: 20}
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: spring-boot-helloworld
+  template:
+    metadata:
+      labels:
+        app: spring-boot-helloworld
+    spec:
+      containers:
+      - name: spring-boot-helloworld
+        image: ikubernetes/spring-boot-helloworld:v0.9.2
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: 32Mi
+            cpu: 50m
+        livenessProbe:
+          httpGet:
+            path: '/'
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+        readinessProbe:
+          httpGet:
+            path: '/'
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-helloworld
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-boot-helloworld
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-boot-helloworld-canary
+spec:
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-boot-helloworld
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-boot-helloworld
+spec:
+  ingressClassName: "nginx"
+  rules:
+    - host: hello.magedu.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: spring-boot-helloworld
+                port:
+                  number: 80
+---
