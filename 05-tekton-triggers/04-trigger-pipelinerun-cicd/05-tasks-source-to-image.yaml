@@ -47,7 +47,7 @@ spec:
   volumes:
     - name: m2
       persistentVolumeClaim:
-        claimName: maven-cache
+        claimName: maven-cache-cicd
 ---
 apiVersion: tekton.dev/v1
 kind: Task

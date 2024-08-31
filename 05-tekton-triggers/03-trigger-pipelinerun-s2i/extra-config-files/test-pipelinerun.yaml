@@ -33,7 +33,7 @@ spec:
           resources:
             requests:
               storage: 1Gi
-          storageClassName: nfs-csi
+          storageClassName: openebs-hostpath
     - name: docker-config
       secret:
         secretName: docker-config
