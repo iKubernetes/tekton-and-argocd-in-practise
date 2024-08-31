@@ -1,0 +1,119 @@
+# Maintainer: MageEdu "<mage@magedu.com>"
+# Version: v1.0.1
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  description: Clone the code repository to the workspace. 
+  params:
+    - name: git-repo-url
+      type: string
+      description: git repository url to clone
+    - name: git-revision
+      type: string
+      description: git revision to checkout (branch, tag, sha, ref)
+  workspaces:
+    - name: source
+      description: The git repo will be cloned onto the volume backing this workspace
+  steps:
+    - name: git-clone
+      image: alpine/git:v2.45.2
+      script: | 
+        git clone -v $(params.git-repo-url) $(workspaces.source.path)/source
+        cd $(workspaces.source.path)/source && git reset --hard $(params.git-revision)
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build-to-package
+spec:
+  description: build application and package the files to image
+  workspaces:
+    - name: source
+      description: The git repo that cloned onto the volume backing this workspace
+  steps:
+    - name: build
+      #image: maven:3.8-openjdk-11-slim
+      image: maven:3.8.7-eclipse-temurin-11-alpine
+      workingDir: $(workspaces.source.path)/source
+      volumeMounts:
+        - name: m2
+          mountPath: /root/.m2
+      script: |
+        curl -sL https://gitee.com/mageedu/spring-boot-helloWorld/raw/main/maven/settings.xml -o /usr/share/maven/conf/settings.xml
+        mvn clean install
+  volumes:
+    - name: m2
+      persistentVolumeClaim:
+        claimName: maven-cache
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: generate-build-id
+spec:
+  params:
+    - name: version
+      description: The version of the application
+      type: string
+  results:
+    - name: datetime
+      description: The current date and time
+    - name: buildId
+      description: The build ID
+  steps:
+    - name: generate-datetime
+      image: ikubernetes/admin-box:v1.2
+      script: |
+        #!/usr/bin/env bash
+        datetime=`date +%Y%m%d-%H%M%S`
+        echo -n ${datetime} | tee $(results.datetime.path)
+    - name: generate-buildid
+      image: ikubernetes/admin-box:v1.2
+      script: |
+        #!/usr/bin/env bash
+        buildDatetime=`cat $(results.datetime.path)`
+        buildId=$(params.version)-${buildDatetime}
+        echo -n ${buildId} | tee $(results.buildId.path)
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: image-build-and-push
+spec:
+  description: package the application files to image
+  params:
+    - name: dockerfile
+      description: The path to the dockerfile to build (relative to the context)
+      default: Dockerfile
+    - name: image-url
+      description: Url of image repository
+    - name: image-tag
+      description: Tag to apply to the built image
+  workspaces:
+    - name: source
+    - name: dockerconfig
+      mountPath: /kaniko/.docker
+  steps:
+    - name: image-build-and-push
+      #image: gcr.io/kaniko-project/executor:debug
+      image: gcr.io/kaniko-project/executor:v1.23.2
+      securityContext:
+        runAsUser: 0
+      env:
+        - name: DOCKER_CONFIG
+          value: /kaniko/.docker
+      command:
+        - /kaniko/executor
+      args:
+        - --dockerfile=$(params.dockerfile)
+        - --context=$(workspaces.source.path)/source
+        - --insecure
+        - --insecure-pull
+        - --skip-tls-verify
+        - --skip-tls-verify-pull
+        - --skip-push-permission-check
+        - --destination=$(params.image-url):$(params.image-tag)
+---

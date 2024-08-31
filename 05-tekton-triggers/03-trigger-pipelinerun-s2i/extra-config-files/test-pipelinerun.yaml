@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: s2i-buildid-run-10001
+spec:
+  serviceAccountName: default
+  #serviceAccountNames:
+  #  - taskName: deploy-to-cluster
+  #    serviceAccountName: helloworld-admin
+  pipelineRef:
+    name: source-to-image
+  taskRunSpecs:
+    - pipelineTaskName: deploy-to-cluster
+      taskServiceAccountName: helloworld-admin
+  #    taskPodTemplate:
+  #      nodeSelector:
+  #        disktype: ssd
+  params:
+    - name: git-repo-url
+      value: http://code.gitlab.svc.cluster.local/root/spring-boot-helloworld.git
+    - name: git-revision
+      value: main
+    - name: image-url
+      value: ikubernetes/spring-boot-helloworld
+    - name: version
+      value: v0.9
+  workspaces:
+    - name: codebase
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+          storageClassName: nfs-csi
+    - name: docker-config
+      secret:
+        secretName: docker-config

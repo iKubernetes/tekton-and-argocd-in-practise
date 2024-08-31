@@ -1,0 +1,40 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: s2i-tt
+spec:
+  params:  # 定义参数
+  - name: git-revision
+  - name: git-repo-url
+  - name: image-url
+  - name: version
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      generateName: s2i-trigger-run-  # TaskRun 名称前缀
+    spec:
+      pipelineRef:
+        name: source-to-image
+      params:
+        - name: git-repo-url
+          value: $(tt.params.git-repo-url)
+        - name: git-revision
+          value: $(tt.params.git-revision)
+        - name: image-url
+          value: $(tt.params.image-url)
+        - name: version
+          value: $(tt.params.version)
+      workspaces:
+        - name: codebase
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 1Gi
+              storageClassName: openebs-hostpath
+        - name: docker-config
+          secret:
+            secretName: registry-credential
