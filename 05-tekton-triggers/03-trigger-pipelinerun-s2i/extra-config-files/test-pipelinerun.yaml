@@ -22,6 +22,7 @@ spec:
       value: main
     - name: image-url
       value: ikubernetes/spring-boot-helloworld
+      #value: registry.magedu.com/ikubernetes/spring-boot-helloworld
     - name: version
       value: v0.9
   workspaces:
@@ -36,4 +37,4 @@ spec:
           storageClassName: openebs-hostpath
     - name: docker-config
       secret:
-        secretName: docker-config
+        secretName: registry-credential
