@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: s2i-listener 
+  name: cicd-listener 
 spec:
   serviceAccountName: tekton-triggers-gitlab-sa
   triggers:
